@@ -767,6 +767,114 @@
     }
 
     /* Responsive */
+    @media (max-width: 420px) {
+      .main {
+        padding: 12px 10px 8px;
+      }
+
+      .member-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .member-card {
+        padding: 10px 6px;
+        min-height: 42px;
+        gap: 4px;
+      }
+
+      .member-card .name {
+        font-size: 14px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .pay-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-overview {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .summary-bar {
+        gap: 6px;
+      }
+
+      .summary-item {
+        padding: 8px 10px;
+        font-size: 12px;
+        min-width: 60px;
+      }
+
+      .summary-item strong {
+        font-size: 15px;
+      }
+
+      .header {
+        padding: 10px 12px calc(10px + var(--safe-top));
+      }
+
+      .header-title {
+        font-size: 16px;
+      }
+
+      .tab-btn {
+        font-size: 10px;
+        padding: 4px 2px;
+      }
+
+      .tab-btn .tab-icon {
+        font-size: 18px;
+      }
+
+      .date-bar {
+        gap: 6px;
+      }
+
+      .date-bar input[type="date"] {
+        font-size: 13px;
+        padding: 8px 10px;
+        min-height: 38px;
+      }
+
+      .header-date {
+        font-size: 12px;
+      }
+
+      .member-row {
+        padding: 10px 12px;
+        gap: 10px;
+      }
+
+      .member-row .info .name {
+        font-size: 14px;
+      }
+
+      .member-row .avatar {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+      }
+
+      .card {
+        padding: 12px;
+      }
+
+      .btn {
+        padding: 8px 14px;
+        font-size: 14px;
+        min-height: 38px;
+      }
+
+      .modal-content {
+        padding: 16px;
+      }
+    }
+
     @media (min-width: 600px) {
       .member-grid {
         grid-template-columns: repeat(4, 1fr);
