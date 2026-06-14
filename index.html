@@ -765,6 +765,52 @@
       border-color: #bbb;
     }
 
+    @media (max-width: 370px) {
+      .main {
+        padding: 10px 8px 8px;
+      }
+
+      .member-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+      }
+
+      .member-card {
+        padding: 8px 4px;
+        min-height: 40px;
+      }
+
+      .member-card .name {
+        font-size: 13px;
+      }
+
+      .summary-item {
+        padding: 6px 8px;
+        font-size: 11px;
+      }
+
+      .summary-item strong {
+        font-size: 14px;
+      }
+
+      .header {
+        padding: 8px 10px calc(8px + var(--safe-top));
+      }
+
+      .header-title {
+        font-size: 15px;
+      }
+
+      .date-bar {
+        flex-wrap: wrap;
+      }
+
+      .date-label {
+        width: 100%;
+        margin-top: 4px;
+      }
+    }
+
     /* Responsive */
     @media (max-width: 420px) {
       .main {
@@ -1166,7 +1212,7 @@
     </button>
     <button class="tab-btn" data-tab="cloud" onclick="app.switchTab('cloud')">
       <span class="tab-icon">☁️</span>
-      <span>云端</span>
+      <span>数据</span>
     </button>
     <button class="tab-btn" data-tab="payments" onclick="app.switchTab('payments')">
       <span class="tab-icon">💰</span>
