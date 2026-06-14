@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>正道书法班签到</title>
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --paper: #F5F0E8;
+      --vermillion: #C23531;
+      --vermillion-dark: #9a2a26;
+      --ink-light: #6B6B6B;
+      --border: #E0D8CC;
+      --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --tab-height: 60px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      min-width: 400px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      padding: 12px 16px calc(12px + var(--safe-top));
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .header-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--vermillion);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-date {
+      font-size: 13px;
+      color: var(--ink-light);
+      white-space: nowrap;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px 16px 8px;
+    }
+
+    /* Tab Bar */
+    .tab-bar {
+      display: flex;
+      background: white;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      padding-bottom: var(--safe-bottom);
+      height: calc(var(--tab-height) + var(--safe-bottom));
+    }
+
+    .tab-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      border: none;
+      background: none;
+      color: var(--ink-light);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 6px 4px;
+      transition: color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+    }
+
+    .tab-btn .tab-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .tab-btn:active {
+      opacity: 0.6;
+    }
+
+    .tab-btn.active {
+      color: var(--vermillion);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 2px;
+      background: var(--vermillion);
+      border-radius: 0 0 2px 2px;
+    }
+
+    /* Tab Panels */
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* Section */
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Card */
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--card-shadow);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    /* Sign-in date bar */
+    .date-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .date-bar input[type="date"] {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      background: white;
+      color: var(--ink);
+      min-height: 44px;
+    }
+
+    .date-label {
+      font-size: 15px;
+      font-weight: 500;
+      white-space: nowrap;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Group tabs */
+    .group-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .group-tabs::-webkit-scrollbar {
+      display: none
+    }
+
+    .group-tab {
+      flex-shrink: 0;
+      padding: 4px 12px;
+      border-radius: 12px;
+      border: 1px solid #d0d5dd;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .15s;
+      color: #555;
+    }
+
+    .group-tab.active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+
+    .group-tab:not(.active):hover {
+      background: #f0f4ff;
+      border-color: #2563eb;
+    }
+
+    /* Member Grid for sign-in */
+    .member-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      contain: layout style;
+    }
+
+    .member-card {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 8px;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 48px;
+      position: relative;
+    }
+
+    .member-card .name {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+
+    .member-card .status-icon {
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      line-height: 1;
+    }
+
+    .member-card .status-icon .check-mark {
+      transition: opacity 0.15s;
+    }
+
+    .member-card.present {
+      background: #E8F5E9;
+      border-color: #4CAF50;
+      color: #2E7D32;
+    }
+
+    .member-card.absent {
+      opacity: 0.75;
+    }
+
+    .member-card:active {
+      transform: scale(0.96);
+    }
+
+    /* Summary bar */
+    .summary-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .summary-item {
+      background: white;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--card-shadow);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    .summary-item strong {
+      font-size: 18px;
+      color: var(--vermillion);
+    }
+
+    /* ============ Members Table ============ */
+    .search-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .search-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, .15);
+    }
+
+    .member-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: white;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--card-shadow);
+    }
+
+    .member-row .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--vermillion);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .member-row .info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .member-row .info .name {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .member-row .info .detail {
+      font-size: 12px;
+      color: var(--ink-light);
+      margin-top: 2px;
+    }
+
+    .member-row .actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .member-row .actions button {
+      border: none;
+      background: none;
+      padding: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      border-radius: 6px;
+      transition: background 0.2s;
+      min-width: 36px;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .member-row .actions button:active {
+      background: var(--border);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active {
+      opacity: 0.8;
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: var(--vermillion);
+      color: white;
+    }
+
+    .btn-primary:active {
+      background: var(--vermillion-dark);
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--vermillion);
+      box-shadow: var(--card-shadow)
+    }
+
+    .btn-success {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .btn-ghost {
+      background: none;
+      color: var(--ink-light);
+      padding: 8px 12px;
+      min-height: 36px;
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 13px;
+      min-height: 36px;
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .btn-danger {
+      color: var(--vermillion);
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-light);
+      margin-bottom: 4px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: inherit;
+      background: white;
+      color: var(--ink);
+      min-height: 44px;
+    }
+
+    .form-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--vermillion);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Inline add form */
+    .inline-form {
+      margin-bottom: 12px;
+      padding: 14px;
+      background: white;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--card-shadow);
+      border: 1.5px dashed var(--border);
+    }
+
+    /* ============ Payments ============ */
+    .pay-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .pay-stat {
+      background: white;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--card-shadow);
+      text-align: center;
+    }
+
+    .pay-stat .num {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--vermillion);
+    }
+
+    .pay-stat .label {
+      font-size: 12px;
+      color: var(--ink-light);
+      margin-top: 2px;
+    }
+
+    /* ============ Stats ============ */
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 14px 10px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--card-shadow);
+      text-align: center;
+    }
+
+    .stat-card .num {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--vermillion);
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: var(--ink-light);
+      margin-top: 4px;
+    }
+
+    .stat-member-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .stat-member-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-member-row .name {
+      font-weight: 500;
+      flex: 1;
+      font-size: 18px;
+    }
+
+    .stat-member-row .avatar {
+      width:32px;height:32px;border-radius:50%;
+      background:#d32f2f;color:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:600;flex-shrink:0;
+    }
+    .stat-member-row .count {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--vermillion);
+      white-space: nowrap;
+    }
+
+    /* Attendance detail list */
+    .att-detail-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .att-date-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+
+    .att-date-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px 24px;
+      border-radius: 20px;
+      font-size: 14px;
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: calc(var(--tab-height) + 20px);
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      max-height: 70vh;
+      overflow-y: auto;
+      animation: slideUp 0.25s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .modal-content h3 {
+      font-size: 17px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .modal-actions .btn {
+      flex: 1;
+    }
+
+    .picker-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 45vh;
+      overflow-y: auto;
+      margin-bottom: 12px;
+      padding: 4px 0;
+    }
+
+    .picker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 13px;
+      background: #f5f7fa;
+      border: 1px solid var(--border);
+      user-select: none;
+      transition: all .15s;
+    }
+
+    .picker-item:hover {
+      border-color: #2563eb;
+      background: #f0f4ff;
+    }
+
+    .picker-item input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      margin: 0;
+    }
+
+    .picker-item:has(input:checked) {
+      background: #f5f5f5;
+      border-color: #bbb;
+    }
+
+    /* Responsive */
+    @media (min-width: 600px) {
+      .member-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .main {
+        padding: 24px 32px 16px;
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .header {
+        padding: 16px 32px;
+      }
+
+      .stats-overview {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 900px) {
+      .member-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--ink-light);
+      font-size: 15px;
+    }
+
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    /* Utility */
+    .hidden {
+      display: none !important;
+    }
+
+    .mt-8 {
+      margin-top: 8px;
+    }
+
+    .mb-8 {
+      margin-bottom: 8px;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .gap-8 {
+      gap: 8px;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-sm {
+      font-size: 13px;
+      color: var(--ink-light);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-icon">✍</div>
+      <div class="header-title">正道书法签到</div>
+    </div>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main" id="mainContent">
+    <!-- Sign-in Panel -->
+    <div class="tab-panel active" id="panelCheckin">
+      <div class="date-bar">
+        <input type="date" id="checkinDate" onchange="app.onCheckinDateChange()">
+        <span class="date-label" id="checkinWeekday"></span>
+      </div>
+      <div class="group-tabs" id="groupTabs"></div>
+      <div class="summary-bar" id="checkinSummary">
+        <div class="summary-item">应到人数 <strong id="totalCount">0</strong></div>
+        <div class="summary-item">已签到 <strong id="presentCount">0</strong></div>
+        <div class="summary-item">未签到 <strong id="absentCount">0</strong></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-outline" style="flex:1;min-width:80px" onclick="app.checkinAll()">✅ 全部签到</button>
+        <button class="btn btn-sm btn-outline" style="flex:1;min-width:80px" onclick="app.checkinNone()">⭕ 全部取消</button>
+      </div>
+      <div class="member-grid" id="checkinGrid"></div>
+      <div class="empty-state" id="checkinEmpty">
+        <div class="icon">📋</div>
+        <div>还没有学员，请先到「人员」添加</div>
+      </div>
+    </div>
+
+    <!-- Members Panel -->
+    <div class="tab-panel" id="panelMembers">
+      <div class="card" style="margin-bottom:12px;cursor:pointer;padding:14px 16px;text-align:center"
+        onclick="app.showSemesterDialog()">
+        <span style="font-weight:600;font-size:15px">📅 当前学期</span>
+        <span style="margin-left:8px;color:var(--ink-light);font-size:14px" id="semesterLabel">未设置</span>
+        <span style="margin-left:8px;font-size:12px;color:var(--ink-light)">✏️</span>
+      </div>
+
+      <div class="section-title">
+        <span>学员列表</span>
+        <button class="btn btn-primary btn-sm" onclick="app.showMemberForm()">+ 添加</button>
+      </div>
+      <input class="search-input" id="memberSearch" type="search" placeholder="搜索学员姓名…" oninput="app.renderMembers()">
+      <div class="member-list" id="memberList"></div>
+      <div class="empty-state" id="memberEmpty">
+        <div class="icon">👤</div>
+        <div>还没有学员，点击右上角添加</div>
+      </div>
+    </div>
+
+    <!-- Stats Panel -->
+    <div class="tab-panel" id="panelStats">
+      <div class="section-title"><span>出勤统计</span></div>
+      <!-- Filter card -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:8px;font-size:14px"><span>📅 查询条件</span></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>开始日期</label>
+            <input type="date" id="statsDateFrom">
+          </div>
+          <div class="form-group">
+            <label>结束日期</label>
+            <input type="date" id="statsDateTo">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>选择学员</label>
+          <button class="btn btn-outline btn-sm" style="width:100%;text-align:left" id="statsMemberBtn"
+            onclick="app.showStatsMemberPicker()">全部学员</button>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="app.renderStats()">查询</button>
+      </div>
+      <!-- Results -->
+      <div class="stats-overview" id="statsOverview"></div>
+      <div class="card" style="max-height:600px;overflow-y:auto">
+        <div class="section-title" style="margin-bottom:8px">
+          <span>学员出勤明细</span>
+          <span class="text-sm" id="statsDateRange"></span>
+        </div>
+        <div id="statsList"></div>
+        <div class="empty-state" id="statsEmpty">
+          <div class="icon">📊</div>
+          <div>暂无出勤数据</div>
+        </div>
+      </div>
+
+      <!-- Text export -->
+      <div class="card" style="margin-top:4px">
+        <div class="section-title" style="margin-bottom:8px;font-size:14px"><span>📄 文本导出</span></div>
+        <p class="text-sm" style="margin-bottom:8px">导出出勤报表为文本文件</p>
+        <button class="btn btn-outline btn-sm" style="width:100%" onclick="app.exportText()">📄 导出文本报表</button>
+      </div>
+    </div>
+
+    <!-- Cloud Panel -->
+    <div class="tab-panel" id="panelCloud">
+      <div class="section-title"><span>💿 数据管理</span></div>
+
+      <!-- 导出 -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:8px;font-size:14px"><span>📤 导出</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="app.exportExcel()">📊 Excel导出</button>
+          <button class="btn btn-outline btn-sm" onclick="app.exportText()">📄 文本导出</button>
+          <button class="btn btn-outline btn-sm" onclick="app.exportData()">📥 JSON备份</button>
+        </div>
+      </div>
+
+      <!-- 导入 -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:8px;font-size:14px"><span>📥 导入</span></div>
+        <input type="file" id="importJsonFile" accept=".json" style="display:none" onchange="app.importData(event)">
+        <input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none" onchange="app.importExcelFull(event)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('importJsonFile').click()">📤 JSON导入</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('importExcelFile').click()">📊 Excel导入</button>
+        </div>
+      </div>
+
+      <!-- 云端同步 -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:8px;font-size:14px"><span>☁️ 云端同步</span></div>
+        <p class="text-sm" style="margin-bottom:6px">上传/下载全部数据到 Supabase</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <button class="btn btn-sm btn-outline" onclick="app.syncToCloud()">⬆ 上传到云端</button>
+          <button class="btn btn-sm btn-outline" onclick="app.loadFromCloud()">⬇ 从云端加载</button>
+        </div>
+        <div id="cloudStatus" style="margin-top:6px;font-size:12px;color:var(--ink-light)"></div>
+      </div>
+
+      <!-- 危险操作 -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:8px;font-size:14px"><span>⚠️ 危险操作</span></div>
+        <button class="btn btn-sm btn-outline" style="width:100%;color:#d32f2f;border-color:#d32f2f" onclick="app.clearAllData()">🗑️ 清除全部数据</button>
+      </div>
+    </div>
+
+    <!-- Payments Panel -->
+    <div class="tab-panel" id="panelPayments">
+      <div class="section-title"><span>缴费管理</span></div>
+      <div class="pay-summary" id="paySummary">
+        <div class="pay-stat">
+          <div class="num" id="payTotalAmount">¥0</div>
+          <div class="label">缴费总额</div>
+        </div>
+        <div class="pay-stat">
+          <div class="num" id="payTotalPeople">0</div>
+          <div class="label">缴费人数</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title"
+          style="margin-bottom:0;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none"
+          onclick="app.togglePayForm()">
+          <span>➕ 添加缴费记录</span>
+          <span style="font-size:12px;color:var(--ink-light)" id="payFormToggle">展开</span>
+        </div>
+        <div id="payFormBody" style="display:none;margin-top:12px">
+          <div class="form-group">
+            <label>学员 *</label>
+            <select id="payMemberSelect">
+              <option value="">-- 选择学员 --</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>金额 (元) *</label>
+              <input id="payAmount" type="number" step="0.01" min="0" placeholder="0" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label>缴费日期</label>
+              <input id="payDate" type="date">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <input id="payNotes" placeholder="选填">
+          </div>
+          <button class="btn btn-primary btn-block" onclick="app.addPayment()">保存缴费记录</button>
+        </div>
+      </div>
+      <input class="search-input" id="paySearch" type="search" placeholder="搜索学员…" oninput="app.renderPayRecords()"
+        style="margin-bottom:8px">
+      <div id="payRecords" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="checkin" onclick="app.switchTab('checkin')">
+      <span class="tab-icon">✅</span>
+      <span>签到</span>
+    </button>
+    <button class="tab-btn" data-tab="members" onclick="app.switchTab('members')">
+      <span class="tab-icon">👥</span>
+      <span>人员</span>
+    </button>
+    <button class="tab-btn" data-tab="stats" onclick="app.switchTab('stats')">
+      <span class="tab-icon">📊</span>
+      <span>统计</span>
+    </button>
+    <button class="tab-btn" data-tab="cloud" onclick="app.switchTab('cloud')">
+      <span class="tab-icon">☁️</span>
+      <span>云端</span>
+    </button>
+    <button class="tab-btn" data-tab="payments" onclick="app.switchTab('payments')">
+      <span class="tab-icon">💰</span>
+      <span>缴费</span>
+    </button>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+
+  <script>
+    class App {
+      constructor() {
+        this.STORAGE_KEY = 'calligraphy_signin_data';
+        this.data = this.loadData();
+        this.currentGroup = '';
+        this.statsSelectedMemberIds = null;
+        this.currentTab = 'checkin';
+        this.init();
+      }
+
+      loadData() {
+        try {
+          const raw = localStorage.getItem(this.STORAGE_KEY);
+          if (raw) {
+            const data = JSON.parse(raw);
+            if (data && typeof data === 'object') {
+              return {
+                members: Array.isArray(data.members) ? data.members : [],
+                attendance: Array.isArray(data.attendance) ? data.attendance : [],
+                payments: Array.isArray(data.payments) ? data.payments : [],
+                nextId: data.nextId || 1
+              };
+            }
+          }
+        } catch (e) {
+          console.warn('Data load failed, resetting');
+        }
+        return { members: [], attendance: [], payments: [], nextId: 1 };
+      }
+
+      saveData() {
+        try {
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
+        } catch (e) {
+          this.showToast('数据保存失败，请检查存储空间');
+        }
+      }
+
+      genId() { return this.data.nextId++; }
+
+      today() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      }
+
+      formatDate(str) {
+        const d = new Date(str + 'T00:00:00');
+        return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+      }
+
+      weekday(str) {
+        const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const d = new Date(str + 'T00:00:00');
+        return days[d.getDay()];
+      }
+
+      showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(this._toastTimer);
+        this._toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+      }
+
+      // ========== Navigation ==========
+      switchTab(tab) {
+        this.currentTab = tab;
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+        document.querySelector('.tab-btn[data-tab="' + tab + '"]').classList.add('active');
+        if (tab === 'checkin') this.renderCheckin();
+        else if (tab === 'members') this.renderMembers();
+        else if (tab === 'stats') this.renderStats();
+        else if (tab === 'cloud') this.renderCloud();
+        else if (tab === 'payments') this.renderPayments();
+        document.getElementById('mainContent').scrollTop = 0;
+      }
+
+      // ========== Sign-in ==========
+      isActiveOnDate(m, date) {
+        if (!m.studyStart) return true;
+        return date >= m.studyStart && (!m.studyEnd || date <= m.studyEnd);
+      }
+
+      renderCheckin() {
+        const date = document.getElementById('checkinDate').value || this.today();
+        if (!document.getElementById('checkinDate').value) {
+          document.getElementById('checkinDate').value = date;
+        }
+        document.getElementById('checkinWeekday').textContent = this.weekday(date);
+
+        if (this.data.members.length === 0) {
+          document.getElementById('checkinGrid').innerHTML = '';
+          document.getElementById('groupTabs').innerHTML = '';
+          document.getElementById('checkinSummary').classList.add('hidden');
+          document.getElementById('checkinEmpty').classList.remove('hidden');
+          return;
+        }
+        document.getElementById('checkinEmpty').classList.add('hidden');
+        document.getElementById('checkinSummary').classList.remove('hidden');
+
+        const activeMembers = this.data.members.filter(m => this.isActiveOnDate(m, date));
+
+        // Build unique group list from active members (use notes field)
+        const groups = new Set(activeMembers.map(m => (m.notes || '').trim()).filter(g => g));
+        const groupList = Array.from(groups).sort();
+
+        // Render group tabs
+        let tabsHtml = `<div class="group-tab${this.currentGroup === '' ? ' active' : ''}" data-group="" onclick="app.switchGroup(this)">全部</div>`;
+        for (const g of groupList) {
+          const active = this.currentGroup === g ? ' active' : '';
+          tabsHtml += `<div class="group-tab${active}" data-group="${this.escapeHtml(g)}" onclick="app.switchGroup(this)">${this.escapeHtml(g)}</div>`;
+        }
+        document.getElementById('groupTabs').innerHTML = tabsHtml;
+
+        // If currentGroup no longer exists (e.g. data changed), reset to ''
+        if (this.currentGroup !== '' && !groupList.includes(this.currentGroup)) {
+          this.currentGroup = '';
+        }
+
+        // Filter by group
+        const filtered = this.currentGroup === ''
+          ? activeMembers
+          : activeMembers.filter(m => (m.notes || '').trim() === this.currentGroup);
+
+        const attendanceSet = new Set(
+          this.data.attendance.filter(a => a.date === date).map(a => a.memberId)
+        );
+
+        let present = 0;
+        let html = '';
+        for (const m of filtered) {
+          const isPresent = attendanceSet.has(m.id);
+          if (isPresent) present++;
+          html += `
+        <div class="member-card ${isPresent ? 'present' : 'absent'}" onclick="app.toggleAttendance(${m.id})" data-id="${m.id}">
+          <div class="name">${this.escapeHtml(m.name)}</div>
+          <div class="status-icon"><span class="check-mark" style="opacity:${isPresent ? 1 : 0}">✓</span></div>
+        </div>`;
+        }
+        document.getElementById('checkinGrid').innerHTML = html;
+        document.getElementById('totalCount').textContent = filtered.length;
+        document.getElementById('presentCount').textContent = present;
+        document.getElementById('absentCount').textContent = filtered.length - present;
+      }
+
+      switchGroup(el) {
+        this.currentGroup = el.dataset.group || '';
+        this.renderCheckin();
+      }
+
+      toggleAttendance(memberId) {
+        const date = document.getElementById('checkinDate').value || this.today();
+        const idx = this.data.attendance.findIndex(a => a.memberId === memberId && a.date === date);
+        if (idx >= 0) {
+          this.data.attendance.splice(idx, 1);
+        } else {
+          this.data.attendance.push({ id: this.genId(), memberId, date, time: new Date().toTimeString().slice(0, 5) });
+        }
+        this.saveData();
+        this.renderCheckin();
+      }
+
+      onCheckinDateChange() {
+        this.renderCheckin();
+      }
+
+      checkinAll() {
+        const date = document.getElementById('checkinDate').value || this.today();
+        const activeMembers = this.data.members.filter(m => this.isActiveOnDate(m, date));
+        const target = this.currentGroup === ''
+          ? activeMembers
+          : activeMembers.filter(m => (m.notes || '').trim() === this.currentGroup);
+        for (const m of target) {
+          if (!this.data.attendance.some(a => a.memberId === m.id && a.date === date)) {
+            this.data.attendance.push({ id: this.genId(), memberId: m.id, date, time: new Date().toTimeString().slice(0, 5) });
+          }
+        }
+        this.saveData();
+        this.renderCheckin();
+        this.showToast('全部签到');
+      }
+
+      checkinNone() {
+        const date = document.getElementById('checkinDate').value || this.today();
+        const activeMembers = this.data.members.filter(m => this.isActiveOnDate(m, date));
+        const targetIds = new Set(
+          (this.currentGroup === ''
+            ? activeMembers
+            : activeMembers.filter(m => (m.notes || '').trim() === this.currentGroup)
+          ).map(m => m.id)
+        );
+        this.data.attendance = this.data.attendance.filter(a => a.date !== date || !targetIds.has(a.memberId));
+        this.saveData();
+        this.renderCheckin();
+        this.showToast('已全部取消');
+      }
+
+      // ========== Members ==========
+      renderMembers() {
+        const q = (document.getElementById('memberSearch').value || '').trim().toLowerCase();
+        if (this.data.members.length === 0) {
+          document.getElementById('memberList').innerHTML = '';
+          document.getElementById('memberEmpty').classList.remove('hidden');
+        } else {
+          document.getElementById('memberEmpty').classList.add('hidden');
+          let html = '';
+          for (const m of this.data.members.filter(m => !q || m.name.toLowerCase().includes(q))) {
+            const initial = m.name.charAt(0);
+            const isActive = this.isActiveOnDate(m, this.today());
+            html += `
+          <div class="member-row" data-id="${m.id}">
+            <div class="avatar">${this.escapeHtml(initial)}</div>
+            <div class="info">
+              <div class="name">${this.escapeHtml(m.name)} <span style="font-size:11px;padding:1px 6px;border-radius:4px;background:${isActive ? '#E8F5E9' : 'var(--border)'};color:${isActive ? '#2E7D32' : 'var(--ink-light)'}">${isActive ? '在学' : '毕业'}</span><span class="detail">${m.notes ? ' · ' + this.escapeHtml(m.notes) : ''}</span></div>
+              <div class="detail">${m.studyStart ? ' 📅 ' + m.studyStart + (m.studyEnd ? ' ~ ' + m.studyEnd : ' ~') : ''}</div>
+              <div class="detail">${m.phone ? this.escapeHtml(m.phone) : ''}</div>
+              </div>
+            <div class="actions">
+              <button onclick="app.showEditMember(${m.id})" title="编辑">✏️</button>
+              <button onclick="app.confirmDeleteMember(${m.id})" title="删除">🗑️</button>
+            </div>
+          </div>`;
+          }
+          document.getElementById('memberList').innerHTML = html;
+        }
+        const ds = this.loadDefaultSemester();
+        const label = document.getElementById('semesterLabel');
+        if (label) {
+          label.textContent = ds.start ? ds.start + ' ~ ' + (ds.end || '至今') : '未设置';
+        }
+      }
+
+      showMemberForm(editData) {
+        const overlay = document.getElementById('modalOverlay');
+        const content = document.getElementById('modalContent');
+        const isEdit = !!editData;
+        const ds = isEdit ? { start: '', end: '' } : this.loadDefaultSemester();
+        content.innerHTML = `
+      <h3>${isEdit ? '编辑学员' : '添加学员'}</h3>
+      <div class="form-group">
+        <label>姓名 *</label>
+        <input id="mfName" value="${isEdit ? this.escapeHtml(editData.name) : ''}" placeholder="请输入姓名" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label>电话</label>
+        <input id="mfPhone" value="${isEdit ? this.escapeHtml(editData.phone || '') : ''}" placeholder="选填" maxlength="20">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>开始日期</label>
+          <input id="mfStudyStart" type="date" value="${isEdit ? editData.studyStart || '' : ds.start}">
+        </div>
+        <div class="form-group">
+          <label>结束日期</label>
+          <input id="mfStudyEnd" type="date" value="${isEdit ? editData.studyEnd || '' : ds.end}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>班级</label>
+        <input id="mfNotes" value="${isEdit ? this.escapeHtml(editData.notes || '') : ''}" placeholder="选填">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="app.closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="app.saveMember(${isEdit ? editData.id : 'null'})">保存</button>
+      </div>
+    `;
+        overlay.classList.add('show');
+        setTimeout(() => document.getElementById('mfName')?.focus(), 100);
+      }
+
+      showEditMember(id) {
+        const m = this.data.members.find(x => x.id === id);
+        if (m) this.showMemberForm(m);
+      }
+
+      saveMember(editId) {
+        const name = document.getElementById('mfName').value.trim();
+        if (!name) { this.showToast('请输入姓名'); return; }
+        const phone = document.getElementById('mfPhone').value.trim();
+        const studyStart = document.getElementById('mfStudyStart').value || '';
+        const studyEnd = document.getElementById('mfStudyEnd').value || '';
+        const notes = document.getElementById('mfNotes').value.trim();
+
+        if (editId !== null) {
+          const m = this.data.members.find(x => x.id === editId);
+          if (m) { m.name = name; m.phone = phone; m.studyStart = studyStart; m.studyEnd = studyEnd; m.notes = notes; }
+          this.showToast('已更新');
+        } else {
+          this.data.members.push({ id: this.genId(), name, phone, studyStart, studyEnd, notes, createdAt: this.today() });
+          this.showToast('已添加');
+        }
+        this.saveData();
+        this.closeModal();
+        this.renderMembers();
+        this.renderCheckin();
+      }
+
+      confirmDeleteMember(id) {
+        const m = this.data.members.find(x => x.id === id);
+        if (!m) return;
+        const overlay = document.getElementById('modalOverlay');
+        const content = document.getElementById('modalContent');
+        content.innerHTML = `
+      <h3>确认删除</h3>
+      <p style="text-align:center;color:var(--ink-light);margin-bottom:16px;">确定要删除「${this.escapeHtml(m.name)}」吗？<br>相关签到和缴费记录不会被删除。</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="app.closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="app.deleteMember(${id})">删除</button>
+      </div>
+    `;
+        overlay.classList.add('show');
+      }
+
+      deleteMember(id) {
+        this.data.members = this.data.members.filter(x => x.id !== id);
+        this.saveData();
+        this.closeModal();
+        this.renderMembers();
+        this.renderCheckin();
+        this.showToast('已删除');
+      }
+
+      importExcelFull(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (typeof XLSX === 'undefined') { this.showToast('Excel 库加载中，请稍后重试'); e.target.value = ''; return; }
+        if (!confirm('导入将覆盖当前所有数据，确定继续吗？')) { e.target.value = ''; return; }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const data = new Uint8Array(ev.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+
+            // 学员名单
+            const memberRows = wb.SheetNames.includes('学员名单')
+              ? XLSX.utils.sheet_to_json(wb.Sheets['学员名单'])
+              : [];
+            const newMembers = [];
+            const nameToId = {};
+            for (const r of memberRows) {
+              const row = {};
+              for (const k of Object.keys(r)) row[k.trim().toLowerCase()] = (r[k] || '').toString().trim();
+              const name = row.name || row['姓名'] || '';
+              if (!name) continue;
+              const id = this.genId();
+              nameToId[name] = id;
+              newMembers.push({
+                id,
+                name,
+                phone: row.phone || row['电话'] || '',
+                notes: row.notes || row['班级'] || '',
+                studyStart: row.studystart || row['入学日期'] || '',
+                studyEnd: row.studyend || row['毕业日期'] || '',
+                createdAt: this.today(),
+              });
+            }
+
+            // 出勤记录
+            const attRows = wb.SheetNames.includes('出勤记录')
+              ? XLSX.utils.sheet_to_json(wb.Sheets['出勤记录'])
+              : [];
+            const newAtt = [];
+            for (const r of attRows) {
+              const row = {};
+              for (const k of Object.keys(r)) row[k.trim().toLowerCase()] = (r[k] || '').toString().trim();
+              const name = row['学员'] || '';
+              const date = row['日期'] || row.date || '';
+              if (!name || !date) continue;
+              const memberId = nameToId[name];
+              if (!memberId) continue;
+              newAtt.push({
+                id: this.genId(),
+                memberId,
+                date: date.replace(/\//g, '-'),
+                time: row['签到时间'] || row.time || '',
+              });
+            }
+
+            // 缴费记录
+            const payRows = wb.SheetNames.includes('缴费记录')
+              ? XLSX.utils.sheet_to_json(wb.Sheets['缴费记录'])
+              : [];
+            const newPay = [];
+            for (const r of payRows) {
+              const row = {};
+              for (const k of Object.keys(r)) row[k.trim().toLowerCase()] = (r[k] || '').toString().trim();
+              const name = row['学员'] || '';
+              const amount = parseFloat(row['金额'] || row.amount);
+              const date = row['日期'] || row.date || '';
+              if (!name || isNaN(amount) || !date) continue;
+              const memberId = nameToId[name];
+              if (!memberId) continue;
+              newPay.push({
+                id: this.genId(),
+                memberId,
+                amount,
+                date: date.replace(/\//g, '-'),
+                notes: row['备注'] || row.notes || '',
+              });
+            }
+
+            this.data = {
+              members: newMembers,
+              attendance: newAtt,
+              payments: newPay,
+              nextId: this.data.nextId,
+            };
+            this.saveData();
+            this.currentGroup = '';
+            this.switchTab(this.currentTab);
+            this.showToast(`Excel 导入完成：${newMembers.length} 学员 · ${newAtt.length} 签到 · ${newPay.length} 缴费`);
+          } catch (err) {
+            this.showToast('导入失败：' + err.message);
+          }
+          e.target.value = '';
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      closeModal() {
+        document.getElementById('modalOverlay').classList.remove('show');
+      }
+
+      // ========== Payments ==========
+      renderPayments() {
+        const sel = document.getElementById('payMemberSelect');
+        sel.innerHTML = '<option value="">-- 选择学员 --</option>';
+        for (const m of this.data.members) {
+          sel.innerHTML += `<option value="${m.id}">${this.escapeHtml(m.name)}</option>`;
+        }
+        document.getElementById('payDate').value = this.today();
+
+        const payers = new Set(this.data.payments.map(p => p.memberId));
+        const totalAmount = this.data.payments.reduce((s, p) => s + (p.amount || 0), 0);
+        document.getElementById('payTotalAmount').textContent = '¥' + totalAmount.toFixed(2);
+        document.getElementById('payTotalPeople').textContent = payers.size;
+
+        this.renderPayRecords();
+      }
+
+      renderPayRecords() {
+        const container = document.getElementById('payRecords');
+        const q = (document.getElementById('paySearch')?.value || '').trim().toLowerCase();
+        if (this.data.payments.length === 0) {
+          container.innerHTML = `<div class="empty-state"><div class="icon">📄</div><div>暂无缴费记录</div></div>`;
+          return;
+        }
+        const sorted = [...this.data.payments].sort((a, b) => (b.id || 0) - (a.id || 0));
+        let html = '';
+        for (const p of sorted) {
+          const m = this.data.members.find(x => x.id === p.memberId);
+          if (q && m && !m.name.toLowerCase().includes(q)) continue;
+          html += `
+        <div class="member-row" style="flex-wrap:wrap">
+          <div class="avatar" style="background:var(--vermillion);font-size:14px">${m ? this.escapeHtml(m.name.charAt(0)) : '?'}</div>
+          <div class="info">
+            <div class="name">${m ? this.escapeHtml(m.name) : '(已删除)'} <strong style="color:var(--vermillion)">¥${p.amount}</strong></div>
+            <div class="detail">${p.date}${p.notes ? ' · ' + this.escapeHtml(p.notes) : ''}</div>
+          </div>
+          <div class="actions">
+            <button onclick="app.deletePayment(${p.id})" title="删除" style="font-size:16px">🗑️</button>
+          </div>
+        </div>`;
+        }
+        container.innerHTML = html;
+      }
+
+      addPayment() {
+        const memberId = parseInt(document.getElementById('payMemberSelect').value);
+        if (!memberId) { this.showToast('请选择学员'); return; }
+        const amount = parseFloat(document.getElementById('payAmount').value);
+        if (isNaN(amount) || amount <= 0) { this.showToast('请输入有效的金额'); return; }
+        const date = document.getElementById('payDate').value || this.today();
+        const notes = document.getElementById('payNotes').value.trim();
+        this.data.payments.push({ id: this.genId(), memberId, amount, date, notes });
+        this.saveData();
+        this.renderPayments();
+        this.showToast('缴费记录已保存');
+        document.getElementById('payAmount').value = '';
+        document.getElementById('payNotes').value = '';
+        this.togglePayForm(true);
+      }
+
+      togglePayForm(forceHide) {
+        const body = document.getElementById('payFormBody');
+        const toggle = document.getElementById('payFormToggle');
+        if (forceHide === true || body.style.display !== 'none') {
+          body.style.display = 'none';
+          if (toggle) toggle.textContent = '展开';
+        } else {
+          body.style.display = '';
+          if (toggle) toggle.textContent = '收起';
+        }
+      }
+
+      deletePayment(payId) {
+        if (!confirm('确定删除这条缴费记录吗？')) return;
+        this.data.payments = this.data.payments.filter(p => p.id !== payId);
+        this.saveData();
+        this.renderPayments();
+        this.showToast('已删除');
+      }
+
+      // ========== Stats ==========
+      getStatsFilter() {
+        const dateFrom = document.getElementById('statsDateFrom').value;
+        const dateTo = document.getElementById('statsDateTo').value;
+        return { dateFrom, dateTo, memberIds: this.statsSelectedMemberIds };
+      }
+
+      showStatsMemberPicker() {
+        const overlay = document.getElementById('modalOverlay');
+        const content = document.getElementById('modalContent');
+        const prevIds = this.statsSelectedMemberIds;
+        let items = '';
+        for (const m of this.data.members) {
+          const checked = prevIds === null || prevIds.includes(m.id) ? 'checked' : '';
+          items += `<label class="picker-item"><input type="checkbox" value="${m.id}" ${checked}> ${this.escapeHtml(m.name)}</label>`;
+        }
+        content.innerHTML = `
+      <h3>选择学员</h3>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <input class="search-input" type="search" placeholder="搜索学员…" oninput="app.filterPicker(this.value)" style="margin-bottom:0;flex:1">
+        <button class="btn btn-sm btn-outline" onclick="app.pickerSelectAll()">全选</button>
+        <button class="btn btn-sm btn-outline" onclick="app.pickerSelectNone()">取消</button>
+      </div>
+      <div class="picker-list">${items}</div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="app.closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="app.applyStatsMemberPicker()">确定</button>
+      </div>
+    `;
+        overlay.classList.add('show');
+      }
+
+      filterPicker(q) {
+        const val = q.trim().toLowerCase();
+        document.querySelectorAll('.picker-item').forEach(el => {
+          const name = el.textContent.trim().toLowerCase();
+          el.style.display = !val || name.includes(val) ? '' : 'none';
+        });
+      }
+
+      pickerSelectAll() {
+        document.querySelectorAll('.picker-item:not([style*="display:none"]) input').forEach(c => c.checked = true);
+      }
+
+      pickerSelectNone() {
+        document.querySelectorAll('.picker-item:not([style*="display:none"]) input').forEach(c => c.checked = false);
+      }
+
+      applyStatsMemberPicker() {
+        const checked = document.querySelectorAll('.picker-list input:checked');
+        if (checked.length === this.data.members.length) {
+          this.statsSelectedMemberIds = null;
+        } else {
+          this.statsSelectedMemberIds = [...checked].map(c => parseInt(c.value));
+        }
+        this.closeModal();
+        this.updateStatsMemberBtn();
+        this.renderStats();
+      }
+
+      updateStatsMemberBtn() {
+        const btn = document.getElementById('statsMemberBtn');
+        if (!btn) return;
+        if (this.statsSelectedMemberIds === null) {
+          btn.textContent = '全部学员';
+        } else {
+          const names = this.statsSelectedMemberIds
+            .map(id => this.data.members.find(m => m.id === id))
+            .filter(Boolean)
+            .map(m => m.name);
+          btn.textContent = names.length <= 3 ? names.join('、') : `${names.slice(0, 3).join('、')} 等${names.length}人`;
+        }
+      }
+
+      renderStats() {
+        // Set date defaults from current semester if fields are empty
+        const $from = document.getElementById('statsDateFrom');
+        const $to = document.getElementById('statsDateTo');
+        if ($from && !$from.value) {
+          const sem = this.loadDefaultSemester();
+          if (sem.start) $from.value = sem.start;
+        }
+        if ($to && !$to.value) {
+          const sem = this.loadDefaultSemester();
+          if (sem.end) $to.value = sem.end;
+        }
+
+        if (this.data.members.length === 0) {
+          document.getElementById('statsOverview').innerHTML = '';
+          document.getElementById('statsList').innerHTML = '';
+          document.getElementById('statsEmpty').classList.remove('hidden');
+          return;
+        }
+        document.getElementById('statsEmpty').classList.add('hidden');
+        this.updateStatsMemberBtn();
+        const { dateFrom, dateTo, memberIds } = this.getStatsFilter();
+
+        let filteredAtt = this.data.attendance;
+        if (dateFrom) filteredAtt = filteredAtt.filter(a => a.date >= dateFrom);
+        if (dateTo) filteredAtt = filteredAtt.filter(a => a.date <= dateTo);
+        if (memberIds) filteredAtt = filteredAtt.filter(a => memberIds.includes(a.memberId));
+
+        const dates = [...new Set(filteredAtt.map(a => a.date))].sort();
+        const totalDays = dates.length;
+        const totalMembers = memberIds ? memberIds.length : this.data.members.length;
+        const totalAttendance = filteredAtt.length;
+
+        document.getElementById('statsOverview').innerHTML = `
+      <div class="stat-card"><div class="num">${totalMembers}</div><div class="label">学员</div></div>
+      <div class="stat-card"><div class="num">${totalDays}</div><div class="label">上课天数</div></div>
+      <div class="stat-card"><div class="num">${totalAttendance}</div><div class="label">出勤人次</div></div>
+    `;
+
+        document.getElementById('statsDateRange').textContent = totalDays > 0
+          ? (dates[0] + ' ~ ' + dates[dates.length - 1])
+          : '无匹配数据';
+
+        const displayMembers = memberIds
+          ? this.data.members.filter(m => memberIds.includes(m.id))
+          : this.data.members;
+
+        const stats = displayMembers.map(m => {
+          const count = filteredAtt.filter(a => a.memberId === m.id).length;
+          return { member: m, count };
+        });
+        stats.sort((a, b) => b.count - a.count || a.member.name.localeCompare(b.member.name));
+
+        let html = '';
+        if (stats.length > 0) {
+          for (const s of stats) {
+            html += `
+          <div class="stat-member-row" onclick="app.showStatsDetail(${s.member.id})">
+            <div class="avatar">${this.escapeHtml(s.member.name.charAt(0))}</div>
+            <div class="name">${this.escapeHtml(s.member.name)}</div>
+            <div class="count" style="font-size:14px;font-weight:600;color:var(--vermillion)">${s.count} 天</div>
+          </div>`;
+          }
+        } else {
+          html = '<div style="text-align:center;padding:20px;color:var(--ink-light)">所选条件下暂无出勤记录</div>';
+        }
+        document.getElementById('statsList').innerHTML = html;
+      }
+
+      // ========== Default Semester ==========
+      DEFAULT_SEMESTER_KEY = 'calligraphy_default_semester';
+
+      loadDefaultSemester() {
+        try {
+          const raw = localStorage.getItem(this.DEFAULT_SEMESTER_KEY);
+          return raw ? JSON.parse(raw) : { start: '', end: '' };
+        } catch { return { start: '', end: '' }; }
+      }
+
+      clearDefaultSemester() {
+        localStorage.removeItem(this.DEFAULT_SEMESTER_KEY);
+        const label = document.getElementById('semesterLabel');
+        if (label) label.textContent = '未设置';
+        this.showToast('已清除');
+      }
+
+      showSemesterDialog() {
+        const ds = this.loadDefaultSemester();
+        const overlay = document.getElementById('modalOverlay');
+        const content = document.getElementById('modalContent');
+        content.innerHTML = `
+      <h3>📅 设置当前学期</h3>
+      <div class="form-row" style="gap:8px">
+        <div class="form-group" style="flex:1">
+          <label>入学日期</label>
+          <input id="dialogStudyStart" type="date" value="${ds.start || ''}">
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>毕业日期</label>
+          <input id="dialogStudyEnd" type="date" value="${ds.end || ''}">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="app.closeModal()">取消</button>
+        <button class="btn btn-outline" onclick="app.clearDefaultSemester();app.closeModal()">清除</button>
+        <button class="btn btn-primary" onclick="app.saveSemesterFromDialog()">保存</button>
+      </div>`;
+        overlay.classList.add('show');
+        setTimeout(() => document.getElementById('dialogStudyStart')?.focus(), 100);
+      }
+
+      saveSemesterFromDialog() {
+        const start = document.getElementById('dialogStudyStart').value || '';
+        const end = document.getElementById('dialogStudyEnd').value || '';
+        localStorage.setItem(this.DEFAULT_SEMESTER_KEY, JSON.stringify({ start, end }));
+        const label = document.getElementById('semesterLabel');
+        if (label) label.textContent = start ? start + ' ~ ' + (end || '至今') : '未设置';
+        this.closeModal();
+        this.showToast('当前学期已保存');
+      }
+
+
+      clearAllData() {
+        const overlay = document.getElementById('modalOverlay');
+        const content = document.getElementById('modalContent');
+        content.innerHTML = `
+      <h3>确认清除</h3>
+      <p style="text-align:center;color:var(--ink-light);margin-bottom:16px;">确定要清除所有数据吗？<br>此操作不可恢复！</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="app.closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="app.doClearAllData()" style="background:#d32f2f">确认清除</button>
+      </div>
+    `;
+        overlay.classList.add('show');
+      }
+
+      doClearAllData() {
+        this.data = { members: [], attendance: [], payments: [], nextId: 1 };
+        this.saveData();
+        this.closeModal();
+        this.renderCheckin();
+        this.showToast('已清除全部数据');
+      }
+
+      renderCloud() {
+        this.updateCloudStatus();
+      }
+
+      showStatsDetail(memberId) {
+        const m = this.data.members.find(x => x.id === memberId);
+        if (!m) return;
+
+        const { dateFrom, dateTo } = this.getStatsFilter();
+        let filteredAtt = this.data.attendance.filter(a => a.memberId === memberId);
+        if (dateFrom) filteredAtt = filteredAtt.filter(a => a.date >= dateFrom);
+        if (dateTo) filteredAtt = filteredAtt.filter(a => a.date <= dateTo);
+
+        const attDates = filteredAtt.map(a => a.date).sort().reverse();
+        const allDates = [...new Set(
+          (this.data.attendance.filter(a => {
+            let ok = true;
+            if (dateFrom) ok = ok && a.date >= dateFrom;
+            if (dateTo) ok = ok && a.date <= dateTo;
+            return ok;
+          }).map(a => a.date))
+        )].sort();
+
+        const rate = allDates.length > 0 ? (attDates.length / allDates.length * 100) : 0;
+
+        const overlay = document.getElementById('modalOverlay');
+        const content = document.getElementById('modalContent');
+        let detailHtml = '';
+        if (attDates.length > 0) {
+          detailHtml = attDates.map(d => `<div class="att-date-item"><span>${this.formatDate(d)} ${this.weekday(d)}</span><span style="color:#4CAF50">✓ 已签到</span></div>`).join('');
+        } else {
+          detailHtml = '<div style="text-align:center;padding:20px;color:var(--ink-light)">所选时间内无签到记录</div>';
+        }
+
+        content.innerHTML = `
+      <h3>${this.escapeHtml(m.name)} 的出勤明细</h3>
+      <div style="text-align:center;margin-bottom:16px;">
+        <span style="color:var(--ink-light);margin-left:8px;">${attDates.length}天</span>
+      </div>
+      <div class="att-detail-list">${detailHtml}</div>
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-block" onclick="app.closeModal()">关闭</button>
+      </div>
+    `;
+        overlay.classList.add('show');
+      }
+
+      // ========== Utilities ==========
+      escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
+      // ========== Backup ==========
+      exportData() {
+        const blob = new Blob([JSON.stringify(this.data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '书法班签到备份_' + this.today() + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        this.showToast('备份已下载');
+      }
+
+      exportExcel() {
+        if (typeof XLSX === 'undefined') { this.showToast('Excel 库加载中，请稍后重试'); return; }
+        const wb = XLSX.utils.book_new();
+        const t = this.today();
+
+        // 学员名单
+        const membersData = [['姓名', '电话', '班级', '入学日期', '毕业日期']];
+        for (const m of this.data.members) {
+          membersData.push([m.name, m.phone || '', m.notes || '', m.studyStart || '', m.studyEnd || '']);
+        }
+        const ws1 = XLSX.utils.aoa_to_sheet(membersData);
+        XLSX.utils.book_append_sheet(wb, ws1, '学员名单');
+
+        // 出勤记录
+        const dates = [...new Set(this.data.attendance.map(a => a.date))].sort();
+        const attData = [['日期', '星期', '学员', '签到时间']];
+        for (const d of dates) {
+          const dayAtt = this.data.attendance.filter(a => a.date === d);
+          for (const a of dayAtt) {
+            const m = this.data.members.find(x => x.id === a.memberId);
+            attData.push([this.formatDate(d), this.weekday(d), m ? m.name : '(已删除)', a.time || '']);
+          }
+        }
+        const ws2 = XLSX.utils.aoa_to_sheet(attData);
+        XLSX.utils.book_append_sheet(wb, ws2, '出勤记录');
+
+        // 缴费记录
+        const payData = [['学员', '金额', '日期', '备注']];
+        for (const p of this.data.payments) {
+          const m = this.data.members.find(x => x.id === p.memberId);
+          payData.push([m ? m.name : '(已删除)', p.amount, p.date, p.notes || '']);
+        }
+        const ws3 = XLSX.utils.aoa_to_sheet(payData);
+        XLSX.utils.book_append_sheet(wb, ws3, '缴费记录');
+
+        XLSX.writeFile(wb, '书法班签到数据_' + t + '.xlsx');
+        this.showToast('Excel 已下载');
+      }
+
+      exportText() {
+        const lines = [];
+        const t = this.today();
+        lines.push('========================================');
+        lines.push('  书法班签到系统 - 数据报表');
+        lines.push('  导出日期：' + this.formatDate(t) + ' ' + this.weekday(t));
+        lines.push('========================================');
+        lines.push('');
+
+        lines.push('【学员名单】共 ' + this.data.members.length + ' 人');
+        lines.push('----------------------------------------');
+        if (this.data.members.length === 0) {
+          lines.push('  （暂无学员）');
+        } else {
+          for (const m of this.data.members) {
+            const info = [m.name];
+            if (m.phone) info.push('电话：' + m.phone);
+            if (m.notes) info.push('班级：' + m.notes);
+            lines.push('  ' + info.join(' | '));
+          }
+        }
+        lines.push('');
+
+        const dates = [...new Set(this.data.attendance.map(a => a.date))].sort();
+        lines.push('【出勤记录】共 ' + dates.length + ' 天');
+        lines.push('----------------------------------------');
+        if (dates.length === 0) {
+          lines.push('  （暂无出勤记录）');
+        } else {
+          for (const d of dates) {
+            const names = this.data.attendance
+              .filter(a => a.date === d)
+              .map(a => {
+                const m = this.data.members.find(x => x.id === a.memberId);
+                return m ? m.name : '(已删除)';
+              });
+            lines.push('  ' + this.formatDate(d) + ' ' + this.weekday(d) + '（' + names.length + '人）');
+            for (const n of names) {
+              lines.push('    ✓ ' + n);
+            }
+          }
+        }
+        lines.push('');
+
+        lines.push('【缴费记录】');
+        lines.push('----------------------------------------');
+        let hasPay = false;
+        for (const m of this.data.members) {
+          const pays = this.data.payments.filter(p => p.memberId === m.id);
+          if (pays.length === 0) continue;
+          hasPay = true;
+          const total = pays.reduce((s, p) => s + (p.amount || 0), 0);
+          lines.push('  ' + m.name + ' — 累计 ¥' + total.toFixed(2) + '（' + pays.length + '次）');
+          for (const p of pays) {
+            const parts = [p.date, '¥' + p.amount.toFixed(2)];
+            if (p.period) parts.push(p.period);
+            if (p.notes) parts.push(p.notes);
+            lines.push('    ' + parts.join(' | '));
+          }
+        }
+        if (!hasPay) lines.push('  （暂无缴费记录）');
+        lines.push('');
+
+        lines.push('【出勤统计】');
+        lines.push('----------------------------------------');
+        if (dates.length > 0 && this.data.members.length > 0) {
+          const stats = this.data.members.map(m => {
+            const count = this.data.attendance.filter(a => a.memberId === m.id).length;
+            const rate = (count / dates.length * 100);
+            return { name: m.name, count, rate: rate.toFixed(1) + '%' };
+          });
+          stats.sort((a, b) => parseFloat(b.rate) - parseFloat(a.rate));
+          lines.push('  总上课天数：' + dates.length);
+          lines.push('  排名  姓名      出勤    出勤率');
+          stats.forEach((s, i) => {
+            lines.push('  ' + String(i + 1).padStart(2) + '    ' + s.name.padEnd(6) + ' ' + String(s.count).padStart(2) + '/' + dates.length + '  ' + s.rate);
+          });
+        } else {
+          lines.push('  （暂无数据）');
+        }
+        lines.push('');
+        lines.push('========================================');
+        lines.push('  由「书法班签到系统」自动生成');
+
+        const text = lines.join('\n');
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '书法班签到报表_' + this.today() + '.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+        this.showToast('文本已导出');
+      }
+
+      importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (!data.members || !data.attendance || !data.payments) {
+              this.showToast('无效的备份文件');
+              return;
+            }
+            if (!confirm('导入将覆盖当前所有数据，确定继续吗？')) return;
+            this.data = data;
+            this.saveData();
+            this.showToast('数据已恢复');
+            this.switchTab(this.currentTab);
+          } catch (err) {
+            this.showToast('文件解析失败');
+          }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+      }
+
+      // ========== Supabase Sync ==========
+      SB_URL = 'https://rvgkvmlxvqxngoipkmox.supabase.co';
+      SB_KEY = 'sb_publishable_N3g8wrydAl4gTAFNV3hQoQ_2a7AxL2q';
+
+      loadCloudConfig() {
+        return { url: this.SB_URL, key: this.SB_KEY };
+      }
+
+      updateCloudStatus() {
+        const el = document.getElementById('cloudStatus');
+        el.innerHTML = '✅ 已连接 — ' + this.SB_URL.replace(/https?:\/\//, '');
+      }
+
+      fixUrl(url) {
+        url = url.trim();
+        if (!url.startsWith('http')) url = 'https://' + url;
+        url = url.replace(/\/+$/, '');
+        if (!url.includes('.supabase.co')) url += '.supabase.co';
+        return url;
+      }
+
+      async syncToCloud() {
+        const cfg = this.loadCloudConfig();
+        if (!cfg.url || !cfg.key) { this.showToast('请先配置 Supabase'); return; }
+        if (!confirm('上传将覆盖云端数据，确定继续？')) return;
+        const url = this.fixUrl(cfg.url);
+        try {
+          const res = await fetch(url + '/rest/v1/signin_data?id=eq.main', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': cfg.key,
+              'Prefer': 'resolution=merge-duplicates'
+            },
+            body: JSON.stringify({ id: 'main', payload: this.data })
+          });
+          if (!res.ok) throw new Error(await res.text().then(t => 'HTTP ' + res.status + ': ' + t).catch(() => 'HTTP ' + res.status));
+          this.showToast('✅ 已上传到云端');
+        } catch (err) {
+          console.error('syncToCloud error:', err);
+          this.showToast('❌ 上传失败: ' + (err.message || '网络错误'));
+        }
+      }
+
+      async loadFromCloud() {
+        const cfg = this.loadCloudConfig();
+        if (!cfg.url || !cfg.key) { this.showToast('请先配置 Supabase'); return; }
+        if (!confirm('下载将覆盖本地所有数据，确定继续？')) return;
+        const url = this.fixUrl(cfg.url);
+        try {
+          const res = await fetch(url + '/rest/v1/signin_data?id=eq.main&select=payload', {
+            method: 'GET',
+            headers: { 'apikey': cfg.key }
+          });
+          if (!res.ok) throw new Error(await res.text().then(t => 'HTTP ' + res.status + ': ' + t).catch(() => 'HTTP ' + res.status));
+          const result = await res.json();
+          if (!result || result.length === 0 || !result[0].payload) { this.showToast('云端暂无数据'); return; }
+          this.data = result[0].payload;
+          this.saveData();
+          this.switchTab(this.currentTab);
+          this.showToast('✅ 已从云端加载数据');
+        } catch (err) {
+          console.error('loadFromCloud error:', err);
+          this.showToast('❌ 下载失败: ' + (err.message || '网络错误'));
+        }
+      }
+
+      init() {
+        document.getElementById('headerDate').textContent = this.formatDate(this.today()) + ' ' + this.weekday(this.today());
+        document.getElementById('checkinDate').value = this.today();
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) this.closeModal();
+        });
+        this.updateCloudStatus();
+        this.renderCheckin();
+      }
+    }
+
+    const app = new App();
+  </script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+</body>
+</html>
