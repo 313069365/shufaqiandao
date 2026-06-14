@@ -611,11 +611,18 @@
     }
 
     .stat-member-row .avatar {
-      width:32px;height:32px;border-radius:50%;
-      background:#d32f2f;color:#fff;
-      display:flex;align-items:center;justify-content:center;
-      font-weight:600;flex-shrink:0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #d32f2f;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      flex-shrink: 0;
     }
+
     .stat-member-row .count {
       font-size: 14px;
       font-weight: 600;
@@ -676,7 +683,6 @@
       display: none;
       align-items: flex-end;
       justify-content: center;
-      padding-bottom: calc(var(--tab-height) + 20px);
     }
 
     .modal-overlay.show {
@@ -959,10 +965,13 @@
       <div class="card">
         <div class="section-title" style="margin-bottom:8px;font-size:14px"><span>📥 导入</span></div>
         <input type="file" id="importJsonFile" accept=".json" style="display:none" onchange="app.importData(event)">
-        <input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none" onchange="app.importExcelFull(event)">
+        <input type="file" id="importExcelFile" accept=".xlsx,.xls" style="display:none"
+          onchange="app.importExcelFull(event)">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-          <button class="btn btn-outline btn-sm" onclick="document.getElementById('importJsonFile').click()">📤 JSON导入</button>
-          <button class="btn btn-outline btn-sm" onclick="document.getElementById('importExcelFile').click()">📊 Excel导入</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('importJsonFile').click()">📤
+            JSON导入</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('importExcelFile').click()">📊
+            Excel导入</button>
         </div>
       </div>
 
@@ -980,7 +989,8 @@
       <!-- 危险操作 -->
       <div class="card">
         <div class="section-title" style="margin-bottom:8px;font-size:14px"><span>⚠️ 危险操作</span></div>
-        <button class="btn btn-sm btn-outline" style="width:100%;color:#d32f2f;border-color:#d32f2f" onclick="app.clearAllData()">🗑️ 清除全部数据</button>
+        <button class="btn btn-sm btn-outline" style="width:100%;color:#d32f2f;border-color:#d32f2f"
+          onclick="app.clearAllData()">🗑️ 清除全部数据</button>
       </div>
     </div>
 
@@ -2095,4 +2105,5 @@
   </script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </body>
+
 </html>
